@@ -91,10 +91,10 @@ io.on('connection', async(socket)=>{
 
 
 
-//conexion a mongo atlas
-mongoose.connect("mongodb+srv://coder:Coder123@cluster0.n4jwzj5.mongodb.net/Ecommerce?retryWrites=true&w=majority");
-
 app.use('/api/users', router);
-app.use('/api/products', productsRouter);
+app.use('/api/products/', productsRouter);
 app.use('/api/carts', cartsRouter);
 app.use('/api/chats', chatRouter);
+
+//conexion a mongo atlas
+mongoose.connect("mongodb+srv://coder:Coder123@cluster0.n4jwzj5.mongodb.net/Ecommerce?retryWrites=true&w=majority");

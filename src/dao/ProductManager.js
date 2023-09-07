@@ -4,19 +4,28 @@ class ProductManager {
     async addProduct(product) {
         try {
             if (await this.validateCode(product.code)) {
-                console.log("Error! Code exists!");
-    
-                return false;
+              console.log("Error! Code exists!");
+              return false;
             } else {
-                await productModel.create(product)
-                console.log("Product added!");
-    
-                return true;
+              const producto = {
+                title: product.title,
+                description: product.description,
+                code: product.code,
+                price: product.price,
+                status: product.status,
+                stock: product.stock,
+                category: product.category,
+                thumbnails: product.thumbnails,
+              };
+              const createdProduct = await productModel.create(producto);
+              console.log("Product added!");
+              return createdProduct;
             }
-        } catch (error) {
+          } catch (error) {
+            console.error("Error adding product:", error);
             return false;
+          }
         }
-    }
 
     async updateProduct(id, product) {
         try {

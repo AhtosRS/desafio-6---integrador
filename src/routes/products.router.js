@@ -5,6 +5,7 @@ const productsRouter = Router();
 const PM = new ProductManager();
 
 productsRouter.get("/", async (req, res) => {
+    
     const products = await PM.getProducts(req.query);
     res.send({products});
 });
@@ -18,7 +19,7 @@ productsRouter.get("/:pid", async (req, res) => {
 
 productsRouter.post("/", async (req, res) => {
     let {title, description, code, price, status, stock, category, thumbnails} = req.body;
-
+    
     if (!title) {
         res.status(400).send({status:"error", message:"Error! No se cargó el campo Title!"});
         return false;
@@ -55,14 +56,16 @@ productsRouter.post("/", async (req, res) => {
         res.status(400).send({status:"error", message:"Error! No se cargó el campo Thumbnails!"});
         return false;
     } 
-
+    
     const result = await PM.addProduct({title, description, code, price, status, stock, category, thumbnails}); 
+    
 
     if (result) {
         res.send({status:"ok", message:"El Producto se agregó correctamente!"});
     } else {
         res.status(500).send({status:"error", message:"Error! No se pudo agregar el Producto!"});
     }
+
 });
 
 productsRouter.put("/:pid", async (req, res) => {

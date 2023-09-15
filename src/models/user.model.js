@@ -1,14 +1,12 @@
 import mongoose from "mongoose";
 
-const userCollection = 'users' //nombre de la coleccion de la db
-
 const userSchema = new mongoose.Schema({
-    first_name: String,
-    last_name: String,
-    email:{
-        type: String,
-        unique: true
-    }
-})
+    first_name:String,
+    last_name:String,
+    email:String,
+    age:Number,
+    password:String,
+    role: String
+});
 
-export const userMode1 = mongoose.model(userCollection,userSchema, "users");
+export const userModel = mongoose.model("users", userSchema);

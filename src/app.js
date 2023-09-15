@@ -1,12 +1,13 @@
 import express from 'express';
 import __dirname from './utils.js';
-import handlebars from 'express-handlebars';
+import Handlebars from "handlebars";
+import expressHandlebars  from 'express-handlebars';
 import viewsRouter from './routes/views.router.js';
 import {Server} from 'socket.io';
 import { router } from './routes/users.router.js';
 import mongoose from 'mongoose';
 
-
+import { allowInsecurePrototypeAccess } from "@handlebars/allow-prototype-access";
 import ProductManager from "./dao/ProductManager.js";
 import productsRouter from "./routes/products.router.js";
 
@@ -16,6 +17,10 @@ import cartsRouter from "./routes/carts.router.js";
 import ChatManager from './dao/ChatManager.js';
 import chatRouter from './routes/chat.router.js';
 
+import sessionsRouter from "../src/routes/session.router.js"
+import session from 'express-session';
+import MongoStore from 'connect-mongo';
+
 const app = express();
 const httpServer = app.listen(8080, ()=> console.log("Listening on port 8080"));
 
@@ -24,11 +29,28 @@ const io = new Server(httpServer);
 app.use(express.json());
 
 //plantillas
-app.engine('handlebars', handlebars.engine());
+//app.engine('handlebars', handlebars.engine());
+app.engine(
+	"handlebars",
+	expressHandlebars.engine({
+	  handlebars: allowInsecurePrototypeAccess(Handlebars),
+	})
+  );
 app.set('views', __dirname+'/views');
 app.set('view engine', 'handlebars');
 app.use(express.static(__dirname+ '/public'));
 app.use('/', viewsRouter);
+app.use(express.urlencoded({ extended: true }));
+app.use(session({
+	secret: 'M5E7',
+	resave: false,
+	saveUninitialized: true,
+	cookie: { secure: false },
+	store: MongoStore.create({ 
+	  mongoUrl: "mongodb+srv://coder:Coder123@cluster0.n4jwzj5.mongodb.net/Ecommerce?retryWrites=true&w=majority",
+	  collectionName: 'sessions'
+	})
+  }));
 
 const productManager = new ProductManager();
 const cartsManager = new CartManager();
@@ -95,6 +117,8 @@ app.use('/api/users', router);
 app.use('/api/products/', productsRouter);
 app.use('/api/carts', cartsRouter);
 app.use('/api/chats', chatRouter);
+app.use("/api/sessions/", sessionsRouter);
+app.use("/", viewsRouter);
 
 //conexion a mongo atlas
 mongoose.connect("mongodb+srv://coder:Coder123@cluster0.n4jwzj5.mongodb.net/Ecommerce?retryWrites=true&w=majority");

@@ -1,33 +1,26 @@
-<div class="container">
-    <div id="content" class="row"></div>
-    <div class="row my-5">
-        <div class="col-md-6">
-            <h2>Agregar Producto</h2>
-            <div class="mb-3">
-                <label for="exampleInputEmail1" class="form-label">Título</label>
-                <input type="text" class="form-control" id="title">
-            </div>
-            <div class="mb-3">
-                <label for="exampleInputEmail1" class="form-label">descripcion</label>
-                <input type="text" class="form-control" id="thumbnails">
-            </div>
-            <div class="mb-3">
-                <label for="exampleInputEmail1" class="form-label">Precio</label>
-                <input type="text" class="form-control" id="price">
-            </div>
-            <input type="button" class="btn btn-primary" id="btnAgregarProducto" value="Agregar (+)">
-        </div>
-        <div class="col-md-6">
-            <h2>Eliminar Producto</h2>
-            <div class="mb-3">
-                <label for="exampleInputEmail1" class="form-label">#Id del Producto</label>
-                <input type="text" class="form-control" id="idProduct">
-            </div>
-            <input type="button" class="btn btn-primary" id="btnEliminarProducto" value="Eliminar (-)">
-        </div>
-    </div>
-</div>
-
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  {{!-- <link rel="stylesheet" href="/src/public/css/style.css"> --}}
+  <title>Productos en tiempo real</title>
+</head>
+<body>
+  <div class="container">
+    <h1>Productos en tiempo real</h1>
+    <p>Los Post y Delete se manejan desde postman y se ven reflejados en tiempo real aqui</p>
+    <h4>Lista de Productos</h4>
+    <ul id="productList" class="realtime-products">
+      {{#each products}}
+      <li id="product-{{this._id}}" class="product">
+        <img src={{this.thumbnails}} alt={{this.title}}>
+        <span>Producto: {{this.title}} - Stock: {{this.stock}} - Descripción: {{this.description}}</span>
+      </li>
+      {{/each}}
+    </ul>
+  </div>
+</body>
 <script src="/socket.io/socket.io.js"></script>
-<script src="/js/realTime.js"></script>
-{{!-- <script src="/js/main.realTimeProducts.js"></script> --}}
+<script src="../public/js/realTimeProducts.js"></script>
+</html>

@@ -1,40 +1,29 @@
 import { userModel } from "../models/user.model.js";
+import { isValidPassword } from "../utils.js";
 
 class UserManager {
   async addUser(user) {
     try {
-      const existingUser = await userModel.findOne({ email: user.email });
-      if (existingUser) {
-        console.error("El correo electrónico ya está registrado.");
-        return false;
+      if (user.email == "admin@test.com") {
+        user.role = "admin";
       }
 
-      if (
-        user.email === "adminCoder@coder.com" &&
-        user.password === "admincoder123"
-      ) {
-        user.role = "admin";
-      } else {
-        user.role = "usuario";
-      }
       await userModel.create(user);
       console.log("User added!");
 
       return true;
     } catch (error) {
-      console.error("Error durante el register:", error);
       return false;
     }
   }
 
   async login(user, pass, req) {
     try {
-      const userLogged =
-        (await userModel.findOne({ email: user, password: pass })) || null;
+      const userLogged = await userModel.findOne({ email: user });
 
-      if (userLogged) {
+      if (userLogged && isValidPassword(userLogged, pass)) {
         const role =
-          userLogged.email === "adminCoder@coder.com" ? "admin" : "usuario";
+          userLogged.email === "admin@test.com" ? "admin" : "usuario";
 
         req.session.user = {
           id: userLogged._id,
@@ -43,6 +32,7 @@ class UserManager {
           last_name: userLogged.last_name,
           role: role,
         };
+
         const userToReturn = userLogged;
         return userToReturn;
       }

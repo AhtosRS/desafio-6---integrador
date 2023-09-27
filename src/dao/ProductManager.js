@@ -5,7 +5,7 @@ class ProductManager {
     async addProduct(product) {
         try {
             if (await this.validateCode(product.code)) {
-              console.log("Error! Code exists!");
+              console.log("Error: el codigo ya existe");
               return false;
             } else {
               const producto = {
@@ -19,7 +19,7 @@ class ProductManager {
                 thumbnails: product.thumbnails,
               };
               const createdProduct = await productModel.create(producto);
-              console.log("Product added!");
+              console.log("producto agregado!");
               return createdProduct;
             }
           } catch (error) {
@@ -141,7 +141,7 @@ class ProductManager {
         if (this.validateId(id)) {
             return await productModel.findOne({_id:id}).lean() || null;
         } else {
-            console.log("Not found!");
+            console.log("Producto no encontrado");
             
             return null;
         }

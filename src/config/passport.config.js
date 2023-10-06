@@ -3,6 +3,11 @@ import jwt from "passport-jwt";
 import local from "passport-local";
 import { userModel } from "../models/user.model.js";
 import { createHash, isValidPassword } from "../utils.js";
+import GitHubStrategy from "passport-github2";
+import AuthService from "../services/authService.js";
+import { JWT_SECRET, CLIENT_ID_GITHUB, CLIENT_SECRET_GITHUB, ADMIN_EMAIL, ADMIN_PASSWORD } from "../config/config.js";
+
+
 
 const JWTStrategy = jwt.Strategy;
 const ExtractJWT = jwt.ExtractJwt;
@@ -32,18 +37,20 @@ const initializePassport = () => {
             password: createHash(password),
           };
 
-          if (
-            user.email == "admin@test.com" &&
-            password === "adminTest123"
-          ) {
+          console.log("Rol antes de la asignación:", user.role);
+
+          if (user.email == process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
+            console.log("Asignando role de admin");
             user.role = "admin";
           } else {
+            console.log("Asignando role de usuario");
             user.role = "user";
           }
 
-          let result = await userModel.create(user);
-          console.log("Usuario creado con éxito:", result);
+          console.log("Rol después de la asignación:", user.role);
 
+          let result = await userModel.create(user);
+          console.log("Usuario después de guardar:", result);
           if (result) {
             return done(null, result);
           }
@@ -84,7 +91,7 @@ const initializePassport = () => {
     new JWTStrategy(
       {
         jwtFromRequest: ExtractJWT.fromExtractors([cookieExtractor]),
-        secretOrKey: "P4L4BR4S3CR3T4",
+        secretOrKey: process.env.JWT_SECRET,
       },
       async (jwt_payload, done) => {
         try {
@@ -100,6 +107,32 @@ const initializePassport = () => {
     )
   );
 };
+
+passport.use(
+  "github",
+  new GitHubStrategy(
+    {
+      clientID: process.env.CLIENT_ID_GITHUB,
+      clientSecret: process.env.CLIENT_SECRET_GITHUB,
+      callbackURL: "http://localhost:8000/api/sessions/githubcallback",
+    },
+    async (accessToken, refreshToken, profile, done) => {
+      try {
+        const authService = new AuthService();
+        console.log("Profile:", JSON.stringify(profile, null, 2));
+        const user = await authService.githubCallback(profile);
+
+        if (user) {
+          return done(null, user);
+        } else {
+          return done(null, false);
+        }
+      } catch (error) {
+        return done(error);
+      }
+    }
+  )
+);
 
 passport.serializeUser((user, done) => {
   done(null, user._id);

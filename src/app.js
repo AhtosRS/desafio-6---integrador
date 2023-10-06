@@ -16,9 +16,10 @@ import { allowInsecurePrototypeAccess } from "@handlebars/allow-prototype-access
 import ProductManager from "./dao/ProductManager.js";
 import productsRouter from "./routes/products.router.js";
 import cartsRouter from "./routes/carts.router.js";
+import { MONGO_URL, SECRET_KEY_SESSION, PORT } from "../src/config/config.js";
 
 const app = express();
-const port = 8000;
+const port = process.env.PORT || 8000;
 
 const httpServer = app.listen(port, () => {
   console.log("Servidor escuchando en puerto " + port);
@@ -41,13 +42,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
   session({
-    secret: "M5E7",
+    secret: process.env.SECRET_KEY_SESSION,
     resave: false,
     saveUninitialized: false,
     cookie: { secure: false },
     store: MongoStore.create({
-      mongoUrl:
-        "mongodb+srv://coder:Coder123@cluster0.n4jwzj5.mongodb.net/Ecommerce?retryWrites=true&w=majority",
+      mongoUrl: process.env.MONGO_URL,
       collectionName: "sessions",
     }),
   })
@@ -66,9 +66,7 @@ app.use("/", viewsRouter);
 
 const PM = new ProductManager();
 
-mongoose.connect(
-  "mongodb+srv://coder:Coder123@cluster0.n4jwzj5.mongodb.net/Ecommerce?retryWrites=true&w=majority"
-);
+mongoose.connect(process.env.MONGO_URL);
 
 mongoose.connection.on("connected", () => {
   console.log("Conectado a MongoDB");

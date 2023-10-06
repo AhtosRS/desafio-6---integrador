@@ -4,6 +4,7 @@ import CartManager from "../dao/CartManager.js";
 
 const checkSession = (req, res, next) => {
   if (req.session && req.session.user) {
+    console.log("session en Checksession", req.session)
     next();
   } else {
     res.redirect("/login");
@@ -32,6 +33,7 @@ router.get("/", checkSession, async (req, res) => {
 router.get("/products", checkSession, async (req, res) => {
   const products = await PM.getProducts(req.query);
   const user = req.session.user;
+  console.log(user);
   res.render("products", { products, user });
 });
 
@@ -77,7 +79,7 @@ router.get("/register", checkAlreadyLoggedIn, (req, res) => {
 });
 
 router.get("/profile", checkSession, (req, res) => {
-  const userData = req.user;
+  const userData = req.session.user;
   res.render("profile", { user: userData });
 });
 

@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 class CartManager {
   async newCart() {
     let cart = await cartModel.create({ products: [] });
-    console.log("Carrito creado");
+    console.log("Cart created:", cart);
     return {
       status: "ok",
       message: "El Carrito se creó correctamente!",
@@ -16,7 +16,7 @@ class CartManager {
     if (this.validateId(id)) {
       return (await cartModel.findOne({ _id: id }).lean()) || null;
     } else {
-      console.log("Carrito no encotrado");
+      console.log("Not found!");
 
       return null;
     }
@@ -28,7 +28,7 @@ class CartManager {
 
   async addProductToCart(cid, pid) {
     try {
-      console.log(`agregando: ${pid} al carrito: ${cid}`);
+      console.log(`Adding product ${pid} to cart ${cid}`);
 
       if (
         mongoose.Types.ObjectId.isValid(cid) &&
@@ -73,12 +73,12 @@ class CartManager {
       if (this.validateId(cid)) {
         const cart = await this.getCart(cid);
         if (!cart) {
-          console.log("Carrito no encontrado");
+          console.log("Cart not found!");
           return false;
         }
   
         console.log('PID:', pid);
-        console.log('productos del carrito:', cart.products.map(item => item.product._id ? item.product._id.toString() : item.product.toString()));
+        console.log('Cart products:', cart.products.map(item => item.product._id ? item.product._id.toString() : item.product.toString()));
   
         const product = cart.products.find((item) => 
           (item.product._id ? item.product._id.toString() : item.product.toString()) === pid.toString()
@@ -88,19 +88,19 @@ class CartManager {
           product.quantity = quantity;
   
           await cartModel.updateOne({ _id: cid }, { products: cart.products });
-          console.log("Producto agregado");
+          console.log("Product updated!");
   
           return true;
         } else {
-          console.log("El producto no esta en el carrito");
+          console.log("Product not found in cart");
           return false;
         }
       } else {
-        console.log("no existe carrito con ese ID");
+        console.log("Invalid cart ID!");
         return false;
       }
     } catch (error) {
-      console.error("Error actualizando producto:", error);
+      console.error("Error while updating product:", error);
       return false;
     }
   }
@@ -108,11 +108,11 @@ class CartManager {
   async updateProducts(cid, products) {
     try {
         await cartModel.updateOne({_id:cid}, {products:products}, {new:true, upsert:true});
-        console.log("Producto actualizado");
+        console.log("Product updated!");
 
         return true;
     } catch (error) {
-        console.log("Producto no encontrado");
+        console.log("Not found!");
         
         return false;
     }
@@ -127,11 +127,11 @@ class CartManager {
         );
   
         if (updateResult.matchedCount > 0) {
-          console.log("Producto eliminado");
+          console.log("Product deleted!");
           return true;
         }
       } else {
-        console.log("no existe carrito con ese ID");
+        console.log("Invalid cart ID!");
         return false;
       }
     } catch (error) {
@@ -146,15 +146,14 @@ class CartManager {
         const cart = await this.getCart(cid);
 
         await cartModel.updateOne({ _id: cid }, { products: [] });
-        console.log("Producto eliminado");
-
+        console.log("Products deleted!");
         return true;
       } else {
-        console.log("producto no encontrado");
-
+        console.log("Not found!");
         return false;
       }
     } catch (error) {
+      console.error(error);
       return false;
     }
   }

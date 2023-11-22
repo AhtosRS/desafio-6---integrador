@@ -24,7 +24,7 @@ export const passportCall = (strategy) => {
     })(req, res, next);
   };
 };
-
+//test
 export const authorization = (role) => {
   return async (req, res, next) => {
     if (!req.user) {
